@@ -1,15 +1,16 @@
-# source: https://github.com/koenig125/album-artwork-classification
+# data scraping source: https://github.com/koenig125/album-artwork-classification
 
-import argparse
-import json
-import csv
-import random
-import os
-import shutil
+import argparse, json, csv, random, os, shutil, re, glob, sys
 import urllib.request as req
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import cv2
+from sklearn.decomposition import IncrementalPCA
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from collections import defaultdict
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='albums/MUMU',
@@ -57,18 +58,14 @@ def download_images(img_urls, data_dir):
 
 
 def generate_splits(filenames):
-    """Generate 80/10/10 train/dev/test splits for data"""
+    """Generate 80/20 train/test splits for data"""
     filenames.sort()
     random.seed(230)
     random.shuffle(filenames)
     split_1 = int(0.8 * len(filenames))
-    split_2 = int(0.9 * len(filenames))
     filenames_train = filenames[:split_1]
-    filenames_dev = filenames[split_1:split_2]
-    filenames_test = filenames[split_2:]
-    splits = {'train': filenames_train,
-              'dev': filenames_dev,
-              'test': filenames_test}
+    filenames_test = filenames[split_1:]
+    splits = {'train': filenames_train, 'test': filenames_test}
     return splits
 
 
@@ -124,7 +121,7 @@ if __name__ == '__main__':
     # Get the filenames in the data directory
     filenames = [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith('.jpg')]
 
-    # Split into 80%/10%/10% train/dev/test
+    # Split into 80%/20% train/test
     splits = generate_splits(filenames)
 
     # Create new output data directory
