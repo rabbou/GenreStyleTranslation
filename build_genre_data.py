@@ -51,8 +51,8 @@ def make_data(labels, labels_path):
                         if labels[i] in album[5]:
                             img.save(paths[i] + album[0] + ".jpg")
 
-def test_train_clustering(labels, method='kmeans'):
-    dirs = ['albums' + label + '/' for label in labels]
+def train_test_clustering_split(labels, method='kmeans'):
+    dirs = ['albums/' + label + '/' for label in labels]
     for i in range(len(labels)):
         train_pth = 'albums/'+ labels[i] +'/train/'
         test_pth = 'albums/'+ labels[i] +'/test/'
@@ -60,10 +60,13 @@ def test_train_clustering(labels, method='kmeans'):
         create_dir(test_pth)
         print(labels[i])
         all_img_fnames = list(glob.glob(f"{dirs[i]}/*.jpg"))
+        # clustering
         if method == 'kmeans':
             clustered_fnames = cluster_kmeans(all_img_fnames, num_clusters=5, bs=10)
         mode = np.argmin([len(clustered_fnames[i]) for i in range(len(clustered_fnames))])
         print('Cluster size:', len(clustered_fnames[mode]))
+
+        # split into 90/10 train_test
         train, test = train_test_split(clustered_fnames[mode], test_size=0.1, random_state=42)
         for album in train:
             shutil.copy(album, train_pth)
@@ -73,5 +76,5 @@ def test_train_clustering(labels, method='kmeans'):
 if __name__ == '__main__':
     args = parser.parse_args()
     genres = args.genres
-    # make_data(genres, args.labels_path)
-    test_train_clustering(genres)
+    make_data(genres, args.labels_path)
+    train_test_clustering_split(genres)

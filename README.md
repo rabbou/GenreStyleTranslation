@@ -21,4 +21,4 @@ for instance if we want to translate artwork from Classic to Metal. Each such fo
 located in the `dataset` directory contains `trainA, trainB, testA, testB` subfolders
 corresponding to each genres.
 
-    python3 build_gan_ds.py --genres GenreA GenreB
+    python3 build_gan_ds.py --genreA GenreA --genreB GenreB
