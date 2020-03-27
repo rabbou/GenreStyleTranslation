@@ -7,7 +7,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import cv2
 from sklearn.model_selection import train_test_split
-from clustering import *
+from clustering.k_means import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--genres', nargs='+', default=['Metal', 'Dance', 'Classic'],
@@ -64,7 +64,7 @@ def test_train_clustering(labels, method='kmeans'):
             clustered_fnames = cluster_kmeans(all_img_fnames, num_clusters=5, bs=10)
         mode = np.argmin([len(clustered_fnames[i]) for i in range(len(clustered_fnames))])
         print('Cluster size:', len(clustered_fnames[mode]))
-        train, test = train_test_split(clustered_fnames[mode], test_size=0.2, random_state=42)
+        train, test = train_test_split(clustered_fnames[mode], test_size=0.1, random_state=42)
         for album in train:
             shutil.copy(album, train_pth)
         for album in test:
