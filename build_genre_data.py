@@ -65,21 +65,6 @@ def make_data(labels, data_dir, labels_path, album_path):
                     for i in range(len(present_labels)):
                         img.save(album_path + present_labels[i] + '/' + album + ".jpg")
 
-    # with open(labels_path, 'r', newline='') as csvf:
-    #     reader = csv.reader(csvf, delimiter=',')
-    #     print('Iterating over all albums in original data:')
-    #     for album in tqdm(reader, total=147296):
-    #         # album = reader[i]
-    #         path = "albums/MUMU/" + album[0] + ".jpg"
-    #         if os.path.isfile(path):
-    #             img = cv2.imread(path)
-    #             if not has_face(img):
-    #                 # leave out album covers with faces on them
-    #                 img = Image.fromarray(img).resize((256,256))
-    #                 for i in range(len(labels)):
-    #                     if labels[i] in album[5]:
-    #                         img.save(paths[i] + album[0] + ".jpg")
-
 def train_test_clustering_split(labels, method='kmeans'):
     dirs = ['albums/' + label + '/' for label in labels]
     for i in range(len(labels)):
@@ -109,4 +94,4 @@ if __name__ == '__main__':
     for path in paths:
         create_with_overwrite(path)
     make_data(genres, args.data_dir, args.labels_path, args.album_path)
-    # train_test_clustering_split(genres)
+    train_test_clustering_split(genres)
