@@ -46,18 +46,6 @@ def download_images(img_urls, data_dir):
         img_file = os.path.join(data_dir, img_id + img_format)
         req.urlretrieve(img_url, img_file)
 
-def get_album_genres(f_genres):
-    """Retrieve genres for each album in the MuMu dataset"""
-    album_genres = dict()
-    with open(f_genres) as f:
-        data = csv.reader(f)
-        next(data) # skip header
-        for row in data:
-            img_id = row[0] # amazon_id
-            genres = list(row[5].split(','))
-            album_genres[img_id] = genres
-    return album_genres
-
 def save(filenames, output_dir):
     """Save the images contained in `filenames` to the `output_dir`"""
     for filename in tqdm(filenames):
@@ -72,8 +60,5 @@ if __name__ == '__main__':
         print("Dataset at {} not found. Scraping images now.".format(args.data_dir))
         img_urls = get_image_urls(args.mumu_metadata)
         download_images(img_urls, args.data_dir)
-
-    # Get the filenames in the data directory
-    # filenames = [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith('.jpg')]
 
     print("Done building dataset")

@@ -4,7 +4,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--genreA', help='Genre A')
 parser.add_argument('--genreB', help='Genre B')
 parser.add_argument('--new_path', default='datasets/', help='Genres as a list')
-parser.add_argument('--album_path', default='albums/', help='Genres as a list')
+parser.add_argument('--album_path', default='albums/', help='directory where albums are')
 
 def create_with_overwrite(dir_name):
     """Create new directory or overwrite existing dir if it exists."""
