@@ -2,7 +2,7 @@
 
 *This project will be completed by April 1st*
 
-## Data
+## Data Pipeline
 
 To download album covers from amazon to the `albums` folder, run
 
@@ -12,7 +12,7 @@ To make a folder for each wanted genre, run
 
     python3 build_genre_data.py --genres Genre1 Genre2 Genre3 ...
 
-This will also run k-means on each genre to create a batch of more similar
+This will also run a chosen clustering method on each given genre to create a batch of more similar
 artwork within each genre, and we create a test/train (90%/10%) split of the data.
 The resulting folders are located in `albums/Genre/train` and `albums/Genre/test`.
 

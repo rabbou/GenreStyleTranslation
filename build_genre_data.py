@@ -17,6 +17,8 @@ parser.add_argument('--labels_path', default='albums/MuMu_dataset_multi-label.cs
 parser.add_argument('--album_path', default='albums/', help='where to save albums')
 parser.add_argument('--data_dir', default='albums/MUMU/',
                     help="Directory with MUMU album images")
+parser.add_argument('--clusterin_method', default='kmeans',
+                    help="which clustering method to use")
 
 def create_dir(dir_name):
     """Create directory with check not to overwrite existing directory"""
@@ -65,11 +67,11 @@ def make_data(labels, data_dir, labels_path, album_path):
                     for i in range(len(present_labels)):
                         img.save(album_path + present_labels[i] + '/' + album + ".jpg")
 
-def train_test_clustering_split(labels, method='kmeans'):
-    dirs = ['albums/' + label + '/' for label in labels]
+def train_test_clustering_split(labels, album_path, method='kmeans'):
+    dirs = [album_path + label + '/' for label in labels]
     for i in range(len(labels)):
-        train_pth = 'albums/'+ labels[i] +'/train/'
-        test_pth = 'albums/'+ labels[i] +'/test/'
+        train_pth = album_path+ labels[i] +'/train' + method + '/'
+        test_pth = album_path+ labels[i] +'/test' + method + '/'
         create_dir(train_pth)
         create_dir(test_pth)
         print(labels[i])
@@ -94,4 +96,4 @@ if __name__ == '__main__':
     for path in paths:
         create_with_overwrite(path)
     make_data(genres, args.data_dir, args.labels_path, args.album_path)
-    train_test_clustering_split(genres)
+    train_test_clustering_split(genres, args.album_path, args.clustering_method)
