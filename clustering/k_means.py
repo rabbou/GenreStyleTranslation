@@ -6,6 +6,7 @@ import numpy as np
 import cv2, random
 from PIL import Image
 from collections import defaultdict
+from tqdm import tqdm
 
 def combine_images_into_tensor(img_fnames, size=256):
     # Initialize the tensor
@@ -18,8 +19,7 @@ def combine_images_into_tensor(img_fnames, size=256):
 def get_pca_reducer_incremental(tr_tensor, n_comp=10, bs=10):
     # Apply Incremental PCA on the training images
     pca = IncrementalPCA(n_components=n_comp, batch_size=bs)
-    for i in range(0, len(tr_tensor), bs):
-        print(f"fitting {i//bs} th batch")
+    for i in tqdm(range(0, len(tr_tensor), bs)):
         pca.partial_fit(tr_tensor[i:i+bs, :])
     return pca
 
@@ -40,8 +40,7 @@ def cluster_kmeans(all_img_fnames, num_clusters=4, bs=10):
     print("applying PCA transformation")
     points = np.zeros((len(all_img_fnames), n_comp))
     batch_size = 50
-    for i in range(0, len(all_img_fnames), batch_size):
-        print(f"Transforming {i//25} th batch")
+    for i in tqdm(range(0, len(all_img_fnames), batch_size)):
         batch_fnames = all_img_fnames[i:i+batch_size]
         all_tensor = combine_images_into_tensor(batch_fnames)
         points[i:i+batch_size] = pca.transform(all_tensor)

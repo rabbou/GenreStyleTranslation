@@ -15,7 +15,7 @@ def create_with_overwrite(dir_name):
 
 def build_gan_ds(new_path, album_path, labelA, labelB, foldername, method):
     create_with_overwrite(new_path+foldername)
-    shutil.copytree(album_path+labelA+'/train'_+method, new_path+foldername+'/trainA')
+    shutil.copytree(album_path+labelA+'/train_'+method, new_path+foldername+'/trainA')
     shutil.copytree(album_path+labelA+'/test_'+method, new_path+foldername+'/testA')
     shutil.copytree(album_path+labelB+'/train_'+method, new_path+foldername+'/trainB')
     shutil.copytree(album_path+labelB+'/test_'+method, new_path+foldername+'/testB')
@@ -26,6 +26,7 @@ def build_gan_ds(new_path, album_path, labelA, labelB, foldername, method):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    genres = args.genres
-    build_gan_ds(args.new_path, args.album_path, genres[0], genres[1],
-                 genres[0].lower()+'2'+genres[1].lower(), args.clustering_method)
+    genreA = args.genreA
+    genreB = args.genreB
+    build_gan_ds(args.new_path, args.album_path, genreA, genreB,
+                 genreA.lower()+'2'+genreB.lower(), args.clustering_method)

@@ -10,14 +10,14 @@ from sklearn.model_selection import train_test_split
 from clustering.k_means import *
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--genres', nargs='+', default=['Metal', 'Dance', 'Classic'],
+parser.add_argument('--genres', nargs='+', default=['Metal', 'Electronic', 'Classic'],
                     help='Genres as a list')
 parser.add_argument('--labels_path', default='albums/MuMu_dataset_multi-label.csv',
                     help="File with MuMu album genres")
 parser.add_argument('--album_path', default='albums/', help='where to save albums')
 parser.add_argument('--data_dir', default='albums/MUMU/',
                     help="Directory with MUMU album images")
-parser.add_argument('--clusterin_method', default='kmeans',
+parser.add_argument('--clustering_method', default='kmeans',
                     help="which clustering method to use")
 
 def create_dir(dir_name):
@@ -60,30 +60,43 @@ def make_data(labels, data_dir, labels_path, album_path):
         if present_labels:
             path = data_dir + album + ".jpg"
             if os.path.isfile(path):
-                img = cv2.imread(path)
+                img = plt.imread(path)
                 if not has_face(img):
                     # leave out album covers with faces on them
                     img = Image.fromarray(img).resize((256,256))
                     for i in range(len(present_labels)):
                         img.save(album_path + present_labels[i] + '/' + album + ".jpg")
 
-def train_test_clustering_split(labels, album_path, method='kmeans'):
+def plot_cluster(files, label, method, nrows=10, ncols=10):
+    plt.figure(figsize=(ncols, nrows))
+    for i in range(nrows*ncols):
+        plt.subplot(nrows, ncols, i+1)
+        plt.imshow(cv2.imread(files[i]))
+        plt.axis('off')
+    plt.axis('off')
+    plt.savefig('report_files/' + label+'_'+method)
+
+def train_test_clustering_split(labels, album_path, method='kmeans', display=True):
     dirs = [album_path + label + '/' for label in labels]
     for i in range(len(labels)):
-        train_pth = album_path+ labels[i] +'/train' + method + '/'
-        test_pth = album_path+ labels[i] +'/test' + method + '/'
-        create_dir(train_pth)
-        create_dir(test_pth)
+        train_pth = album_path + labels[i] +'/train_' + method + '/'
+        test_pth = album_path + labels[i] +'/test_' + method + '/'
+        create_with_overwrite(train_pth)
+        create_with_overwrite(test_pth)
         print(labels[i])
         all_img_fnames = list(glob.glob(f"{dirs[i]}/*.jpg"))
         # clustering
+        n = 10
         if method == 'kmeans':
-            clustered_fnames = cluster_kmeans(all_img_fnames, num_clusters=5, bs=10)
-        mode = np.argmin([len(clustered_fnames[i]) for i in range(len(clustered_fnames))])
-        print('Cluster size:', len(clustered_fnames[mode]))
+            clustered_fnames = cluster_kmeans(all_img_fnames, num_clusters=n, bs=25)
+        # choice = np.random.randint(0,n-1)
+        choice = np.argsort([len(clustered_fnames[i]) for i in range(len(clustered_fnames))])[n//2]
+        print('Cluster size:', len(clustered_fnames[choice]))
+        if display:
+            plot_cluster(clustered_fnames[choice], labels[i], method)
 
         # split into 90/10 train_test
-        train, test = train_test_split(clustered_fnames[mode], test_size=0.1, random_state=42)
+        train, test = train_test_split(clustered_fnames[choice], test_size=0.1, random_state=42)
         for album in train:
             shutil.copy(album, train_pth)
         for album in test:
@@ -92,8 +105,8 @@ def train_test_clustering_split(labels, album_path, method='kmeans'):
 if __name__ == '__main__':
     args = parser.parse_args()
     genres = args.genres
-    paths = [args.album_path + label + '/' for label in genres]
-    for path in paths:
-        create_with_overwrite(path)
-    make_data(genres, args.data_dir, args.labels_path, args.album_path)
+    # paths = [args.album_path + label + '/' for label in genres]
+    # for path in paths:
+    #     create_with_overwrite(path)
+    # make_data(genres, args.data_dir, args.labels_path, args.album_path)
     train_test_clustering_split(genres, args.album_path, args.clustering_method)
