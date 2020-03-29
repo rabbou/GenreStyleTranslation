@@ -105,8 +105,8 @@ def train_test_clustering_split(labels, album_path, method='kmeans', display=Tru
 if __name__ == '__main__':
     args = parser.parse_args()
     genres = args.genres
-    # paths = [args.album_path + label + '/' for label in genres]
-    # for path in paths:
-    #     create_with_overwrite(path)
-    # make_data(genres, args.data_dir, args.labels_path, args.album_path)
+    paths = [args.album_path + label + '/' for label in genres]
+    for path in paths:
+        create_with_overwrite(path)
+    make_data(genres, args.data_dir, args.labels_path, args.album_path)
     train_test_clustering_split(genres, args.album_path, args.clustering_method)
