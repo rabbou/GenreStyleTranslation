@@ -74,6 +74,7 @@ def plot_cluster(files, label, method, nrows=10, ncols=10):
         plt.imshow(cv2.imread(files[i]))
         plt.axis('off')
     plt.axis('off')
+    create_dir('../report_files')
     plt.savefig('report_files/' + label+'_'+method)
 
 def train_test_clustering_split(labels, album_path, method='kmeans', display=True):
