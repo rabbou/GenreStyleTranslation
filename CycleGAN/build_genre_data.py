@@ -75,7 +75,7 @@ def plot_cluster(files, label, method, nrows=10, ncols=10):
         plt.axis('off')
     plt.axis('off')
     create_dir('../report_files')
-    plt.savefig('report_files/' + label+'_'+method)
+    plt.savefig('../report_files/' + label+'_'+method)
 
 def train_test_clustering_split(labels, album_path, method='kmeans', display=True):
     dirs = [album_path + label + '/' for label in labels]
