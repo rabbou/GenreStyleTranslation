@@ -3,7 +3,7 @@
 \usepackage{amsfonts}
 \usepackage[shortlabels]{enumitem}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1.5in, headheight=-10pt]{geometry}
+\usepackage[margin=1.5in]{geometry}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -26,6 +26,8 @@
 \include{relative-file-path}
 \usepackage[ruled]{algorithm2e}
 \usepackage{cite}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \definecolor{maroon}{RGB}{128, 0, 0}
 \usepackage[colorlinks, urlcolor=blue]{hyperref}
@@ -43,11 +45,11 @@
  \fancyhf{}
  \fancyhead[L]{
 \begin{tabular}{@{}c@{}}
- \includegraphics[height=1cm]{uchicago}
+ \includegraphics[height=1.4cm]{uchicago}
  \end{tabular}
 \href{https://canvas.uchicago.edu/courses/26048}{\textcolor{black}{
  \begin{tabular}{@{}l@{}}
- \large {CMSC 25040} \\ \large {Computer Vision}
+ \large {CMSC 25040} \\ \large {Computer Vision} \\ \large {Professor: Michael Maire}
  \end{tabular}}}
 }
  \fancyfoot[C]{\thepage}
@@ -59,7 +61,7 @@
 
 \def\Image#1{\raisebox{-.5\height}{\includegraphics[width=4cm]{#1}}}
 
-\title{\bf \Large \rule{\linewidth}{1pt}\\Genre to Album Translation for Artwork Creation
+\title{\vspace*{-15pt}\bf \Large \rule{\linewidth}{1pt}\\Genre Style Translation for Album Artwork Creation
 \\ \rule{\linewidth}{2pt}}
 
 \author{\textbf{Isabel Garon}\\ Neuroscience \\ The College, The University of Chicago \\ \texttt{\href{mailto: isabelgaron@uchicago.edu}{isabelgaron@uchicago.edu}}\and
@@ -92,7 +94,7 @@ The Multimodal music dataset used for the cycle GAN training is synthesized from
 
 \subsection{$K$-means}
 
-The first clustering method we attempted was $k$-means, one of the most general and basic clustering methods. With high dimensional data such as images, the use of Singular Value Decomposition prior to the clustering helps reducing our dataset to lower dimensional data while still retaining valuable information, in order to accelerate the clustering process \cite{cite-key}. The 10 singular vectors corresponding to the 10 highest singular values are kept. A value of $k=10$ was sufficient to keep enough data for the training of the Cycle GAN while still retaining enough closeness between artwork within each cluster. Sample clusters can be found in figures \ref{mk} and \ref{ck} of the appendices.
+The first clustering method we attempted was $k$-means, one of the most general and basic clustering methods. With high dimensional data such as images, the use of Singular Value Decomposition prior to the clustering helps reducing our dataset to lower dimensional data while still retaining valuable information, in order to accelerate the clustering process \cite{cite-key}. The 10 singular vectors corresponding to the 10 highest singular values are kept. A value of $k=10$ was sufficient to keep enough data for the training of the Cycle GAN while still retaining enough closeness between artwork within each cluster. The resulting training test sizes were in the range of 150-250 as the cluster of median size was picked for each genre. Sample clusters can be found in figures \ref{mk} and \ref{ck} of the appendices.
 
 \subsection{Feature Distance}
 
@@ -100,11 +102,11 @@ Pairwise distance between each photograph in a genre and a target photo were cal
 
 \subsection{SSIM}
 
-Structural similarity index is a measurement originally intended grade image quality, by distinguishing between an original photo and slightly distorted alternatives \cite{1284395}. Pairwise distance between each album in a genre was calculated using the SSIM function available through Sci-Kit Image. While not originally intended to be a clustering method, this produced some interesting results – albums within the broad category of metal that were most easily identified or stereotypically metal was clustered at the low end of SSIM distance. Classical albums most stereotypically appearing to be classical clustered at the high end of SSIM within their greater genre. In each case, the 25 albums with the most dramatic of their respective ranges, and the 30 nearest neighbors to those 25 albums, were split into training and testing datasets. Sample clusters can be found in figures \ref{ms} and \ref{cs} of the appendices.
+Structural similarity index is a measurement originally intended grade image quality, by distinguishing between an original photo and slightly distorted alternatives \cite{1284395}. Pairwise distance between each album in a genre was calculated using the SSIM function available through Sci-Kit Image. While not originally intended to be a clustering method, this produced some interesting results – albums within the broad category of metal that were most easily identified or stereotypically metal was clustered at the low end of SSIM distance. Classical albums most stereotypically appearing to be classical clustered at the high end of SSIM within their greater genre. In each case, the 25 albums with the most dramatic SSIM values of their respective ranges, and the 30 nearest neighbors to those 25 albums were split into training and testing datasets. Sample clusters can be found in figures \ref{ms} and \ref{cs} of the appendices.
 
 \section{Methods and Results}
 
-\subsection{Cycle-consistent Adversarial Networks}
+\subsection{Cycle-Consistent Adversarial Networks}
 
 The Cycle-GAN was trained over the course of 100 epochs, with a learning rate of 0.0002 on the first 50 before decaying it for the last 50. We maintained $\lambda = 10$ as the relative importance of the two goals. The Networks were trained on the RCC using 3 GPUs with a batch size of 12.
 
@@ -114,18 +116,54 @@ The Cycle-GAN was trained over the course of 100 epochs, with a learning rate of
 \caption{Training of the Cycle-GAN}
 \end{figure}
 
-After trying out each clustering method, the feature image clustering method \cite{5696720} had mixed success. The target image for the dataset is shown in the upper left corner. The resulting dataset seems to be a more or less random selection from the larger metal category, with no greater visual similarity than the data pool at large \ref{msu}. The SSIM method was not intended to be a clustering tool, but originally was going to be applied as a method of comparing final and input images. It is intended to be used as a metric for evaluating very similar images, or the same image with a small degree of noise. SSIM as used here likely reflects the “busyness” of an image – the most prototypically metal albums are clustered at the low end of SSIM values because the albums have a significant amount of decoration and texture, and so are very structurally dissimilar to one another. Classical albums tend to be somewhat simpler, and so are detected as more similar by the SSIM metric (appendix 3).
+After trying out each clustering method, the feature image clustering method \cite{5696720} had mixed success. The target image for the dataset is shown in the upper left corner. The resulting dataset seems to be a more or less random selection from the larger metal category, with no greater visual similarity than the data pool at large (Figure \ref{msu}). The SSIM method was not intended to be a clustering tool, but originally was going to be applied as a method of comparing final and input images. It is intended to be used as a metric for evaluating very similar images, or the same image with a small degree of noise. SSIM as used here likely reflects the “busyness” of an image – the most prototypically metal albums are clustered at the low end of SSIM values because the albums have a significant amount of decoration and texture, and so are very structurally dissimilar to one another. Classical albums tend to be somewhat simpler, and so are detected as more similar by the SSIM metric (Figures \ref{ms} and \ref{cs}). Finally, the use of $k$-means resulted in the strongest translations.
 
-Even given these efforts at limiting the variety in our training sets, we found that the cycle-GAN was unsuccessful at producing any meaningful structural change in the image or texture, except for slight changes in color scheme and slight blurring (Fig. 1).
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/effigy}
+\caption{Translation of a Metal album in the Country genre}
+\label{m2c}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/calexico}
+\caption{Translation of a Country album in the Metal genre}
+\label{c2m}
+\end{figure}
+
+As we can see in figures \ref{m2c} and \ref{c2m}, which were both obtained after training on data made with $k$-means clustering, the albums translated picked up some of the color and qualitative aspects of each genres: the metal album's dark colors were turned into warmer colors, while the country album's more joyful colors were turned into black.
+
+However, even given these efforts at limiting the variety in our training sets, we found that the cycle-GAN was unsuccessful at producing any meaningful structural change in the image or texture, except for slight changes in color scheme, and slight blurring in the fonts.
 
 
 \subsection{Style transfer using Convolutional Neural Networks}
+
+We had much more success performing image-to-image translation using more general style transfer using Convolutional Neural Networks \cite{DBLP:journals/corr/GatysEB15a}. This method isolates image content from image style in two album covers, and then translates the style of one image to the content of another image.
+
+\begin{figure}[h!]
+\centering
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{../report_files/graduation}
+\end{minipage}%
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{../report_files/Black-Sabbath}
+\end{minipage}
+\begin{minipage}{.3\textwidth}
+  \centering
+  \includegraphics[width=.7\linewidth]{../report_files/graduation_transferred}
+\end{minipage}
+\caption{Kanye West's Graduation through Black Sabbath's style}
+\end{figure}
+
+While not capturing the broader trends of style within the music genre, this did make more significant structural changes to the images' style. There was a more drastic change in the rap album being translated through the Rock band's artwork. The album clearly picked up the qualitative features of Black Sabbath's artwork, and through different types of photo transfers, we observed various changes in the structure of the albums.
 
 \section{Conclusion}
 
 Regardless of the clustering method employed, the cycle-GAN did not produce noticeably different images. We predict that this issue stems from not only the variability of data within a genre, but also the variability between genres. Two types of losses were employed by the cycle-GAN: adversarial loss, and cycle consistency loss. Adversarial loss is the loss function structure typically employed by GANs, in which one network generates albums in the style of the target genre, and the other network distinguishes those generated albums, rejecting ones that do not sufficiently imitate the properties of the target genre. Cycle consistency loss is calculated by mapping the new album back to its original domain – the closer it can get to the original, the smaller the loss. We predict that an interaction between these loss functions caused the failure of the cycle-GAN to change the images. The variability between the two genres was so significant, that any album generated by the adversarial networks could not be mapped back to the original domain. Only very small changes in color or slight blurring of the images could sufficiently pass through both loss functions. Adjusting the $\lambda$ value so that the relative importance of the generative adversarial network was greater than the cycle-GAN may have improved performance, but it is hard to predict how insignificant the cycle consistency loss could be made before the network was exclusively a GAN.
 
-\par This project further emphasizes the importance of dataset construction in the overall success of a computer vision project. A method of clustering the data both within and between genres may produce more significant changes in the final album cover, although by limiting the dataset by this constraint, the final albums may be harder to identify as the target genre. In the future, it may be interesting to limit the dataset to more common patterns seen on many albums, i.e. translating the fonts used on the album covers from one genre to another, as the content of the images would be more similar. Neural style transfer was a much more successful method of accomplishing our goal – one possible future area of research would be to generalize the extracted style across several sample images, instead of only one.
+\par This paper further emphasizes the importance of dataset construction in the overall success of a computer vision project. A method of clustering the data both within and between genres may produce more significant changes in the final album cover, although by limiting the dataset by this constraint, the final albums may be harder to identify as the target genre. In the future, it may be interesting to limit the dataset to more common patterns seen on many albums, i.e. translating the fonts used on the album covers from one genre to another, as the content of the images would be more similar. Neural style transfer was a much more successful method of accomplishing our goal – one possible future area of research would be to generalize the extracted style across several sample images, instead of only one.
 
 
 
