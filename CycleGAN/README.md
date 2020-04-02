@@ -22,3 +22,7 @@ located in the `dataset` directory contains `trainA, trainB, testA, testB` subfo
 corresponding to each genres.
 
     python3 build_gan_ds.py --genreA GenreA --genreB GenreB
+
+## Cycle GAN
+
+To run the code for the cyclegan, access the jupyter notebook file and select settings and datasets to train on. The dataset are of the form `genreA2genreB`.
