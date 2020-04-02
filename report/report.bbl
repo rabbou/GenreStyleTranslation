@@ -1,0 +1,42 @@
+\begin{thebibliography}{1}
+
+\bibitem{5696720}
+J.~{Libeks} and D.~{Turnbull}, ``You can judge an artist by an album cover:
+  Using images for music annotation,'' {\em IEEE MultiMedia}, vol.~18, no.~4,
+  pp.~30--37, 2011.
+
+\bibitem{DBLP:journals/corr/ZhuPIE17}
+J.~Zhu, T.~Park, P.~Isola, and A.~A. Efros, ``Unpaired image-to-image
+  translation using cycle-consistent adversarial networks,'' {\em CoRR},
+  vol.~abs/1703.10593, 2017.
+
+\bibitem{DBLP:journals/corr/GatysEB15a}
+L.~A. Gatys, A.~S. Ecker, and M.~Bethge, ``A neural algorithm of artistic
+  style,'' {\em CoRR}, vol.~abs/1508.06576, 2015.
+
+\bibitem{Koenig}
+C.~Koenig, ``Classifying album genres by album artwork,'' {\em
+  \href{https://github.com/koenig125/album-artwork-classification}{GitHub}},
+  2019.
+
+\bibitem{cite-key}
+P.~Drineas, A.~Frieze, R.~Kannan, S.~Vempala, and V.~Vinay, ``Clustering large
+  graphs via the singular value decomposition,'' {\em Machine Learning},
+  vol.~56, no.~1, pp.~9--33, 2004.
+
+\bibitem{cite-key2}
+H.~Bay, T.~Tuytelaars, and L.~Van~Gool, ``Surf: Speeded up robust features,''
+  in {\em Computer Vision --ECCV 2006} (A.~Leonardis, H.~Bischof, and A.~Pinz,
+  eds.), (Berlin, Heidelberg), pp.~404--417, Springer Berlin Heidelberg, 2006.
+
+\bibitem{Sinha06facerecognition}
+P.~Sinha, ``Face recognition by humans: Nineteen results all computer vision
+  researchers should know about,'' in {\em Proceedings of the IEEE},
+  pp.~1948--1962, 2006.
+
+\bibitem{1284395}
+{Zhou Wang}, A.~C. {Bovik}, H.~R. {Sheikh}, and E.~P. {Simoncelli}, ``Image
+  quality assessment: from error visibility to structural similarity,'' {\em
+  IEEE Transactions on Image Processing}, vol.~13, pp.~600--612, April 2004.
+
+\end{thebibliography}
