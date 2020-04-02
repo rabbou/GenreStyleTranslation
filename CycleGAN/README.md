@@ -1,6 +1,6 @@
 # Genre to Album Translation for Artwork Creation Using Cycle-Consistent Adversarial Network
 
-*This project will be completed by April 1st*
+The cycle GAN code, models and files are from the [CycleGAN project Page](https://junyanz.github.io/CycleGAN/)
 
 ## Data Pipeline
 
