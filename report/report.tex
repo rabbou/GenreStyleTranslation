@@ -1,0 +1,179 @@
+%!TeX spellcheck = en-US
+\documentclass{article}
+\usepackage{amsfonts}
+\usepackage[shortlabels]{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1.5in, headheight=-10pt]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage[mathcal]{eucal}
+\usepackage{empheq}
+\usepackage{polynom}
+\usepackage{textpos}
+\usepackage{mathrsfs}
+\usepackage{lmodern}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\usepackage{lastpage}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{changepage}
+\usepackage{soul}
+\usepackage{fancyhdr}
+\usepackage[export]{adjustbox}
+\include{relative-file-path}
+\usepackage[ruled]{algorithm2e}
+\usepackage{cite}
+
+\definecolor{maroon}{RGB}{128, 0, 0}
+\usepackage[colorlinks, urlcolor=blue]{hyperref}
+\definecolor{sols}{HTML}{000099}
+\newcommand*\rfrac[2]{{}^{#1}\!/_{#2}}
+
+\pgfplotsset{compat=1.16}
+\newcommand{\ts}{\textsuperscript}
+\newcommand{\tsub}{\textsubscript}
+\renewcommand*{\proofname}{Proof:}
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+
+\fancypagestyle{header}{%
+ \fancyhf{}
+ \fancyhead[L]{
+\begin{tabular}{@{}c@{}}
+ \includegraphics[height=1cm]{uchicago}
+ \end{tabular}
+\href{https://canvas.uchicago.edu/courses/26048}{\textcolor{black}{
+ \begin{tabular}{@{}l@{}}
+ \large {CMSC 25040} \\ \large {Computer Vision}
+ \end{tabular}}}
+}
+ \fancyfoot[C]{\thepage}
+ \renewcommand{\headrulewidth}{0pt}
+ \renewcommand{\footrulewidth}{0pt}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\def\Image#1{\raisebox{-.5\height}{\includegraphics[width=4cm]{#1}}}
+
+\title{\bf \Large \rule{\linewidth}{1pt}\\Genre to Album Translation for Artwork Creation
+\\ \rule{\linewidth}{2pt}}
+
+\author{\textbf{Isabel Garon}\\ Neuroscience \\ The College, The University of Chicago \\ \texttt{\href{mailto: isabelgaron@uchicago.edu}{isabelgaron@uchicago.edu}}\and
+\textbf{Ruben Abbou} \\ Computational and Applied Mathematics, Statistics \\ The College, The University of Chicago \\
+\texttt{\href{mailto: ruben@abbou.com}{ruben@abbou.com}}}
+
+\date{Winter 2020}
+
+\begin{document}
+\maketitle
+\thispagestyle{header}
+
+\begin{center}
+Code: \href{https://github.com/rabbou/GenreToAlbumArtworkTranslation}{GitHub}
+\end{center}
+% \begin{abstract}
+% not necessary
+% \end{abstract}
+
+\section{Introduction}
+
+A significant challenge in the field of computer vision is the expectation that in performing a visual task, the computer navigates the linguistic and often cultural facets of visual cognition. The wealth of data available on musical album covers provides an interesting tool to explore the capacity of a computer to meet these expectations. Within a single musical genre, although there is a high degree of variability in album covers, humans can guess the genre of an album cover with a high rate of accuracy. It also has been shown that some of the low-level statistical features of album covers can be associated with the genre of an album, and therefore encode valuable information that is useful for contextualizing music \cite{5696720}.
+\par In the following study, we will investigate methods of translating the style from a given genre to albums of a different genres, using Cycle-Consistent Adversarial Networks \cite{DBLP:journals/corr/ZhuPIE17}. We aim to perform collection-style transfers from entire genres to out-of-genre album covers. We anticipated this approach would be best suited to our dataset for two reasons: first, the unpaired nature of collection style transfer is feasible with this data pool – it would be impossible to generate pairs of the same album in multiple genres in a non-work-intensive manner. Second, we wanted to explore what generalizations would be made across an entire genre of music, instead of translating the style of a single artist to another.
+It is possible that the dataset is too variable for cycle-consistency to provide a sufficient constraint, in which case we will also evaluate the performance of conditional style transfer techniques to achieve artistic style transfer \cite{DBLP:journals/corr/GatysEB15a}.
+
+\section{Dataset}
+
+The Multimodal music dataset used for the cycle GAN training is synthesized from the Amazon Reviews dataset and the Million Song dataset \cite{Koenig}. It is composed of 31,471 albums each tagged with their genres. Each album cover was resized to a consistent 256 by 256 pixels. Within this larger dataset, which provided varying levels of genre specificity (from over 23,000 “Rock” tags to less than 100 tags for “Ambient Pop”), we chose to work with only a few genres. It is important to note that a single album can be tagged with several different genres. - for instance, an album tagged as “Ambient Pop” can also be tagged as “Dream Pop,” “Lo-fi,” and “Rock.” We focused our trials on genres of music that were most reliably correctly categorized in literature \cite{5696720} based on several image distance metrics – classical was the best performing genre for album property based categorization, followed by metal and dance, and on genres on which we expected artwork to differ more naturally from others. Within the metal genre, we have in total 2,869 images. In classic, there are 2,807, in dance there are 2,255 images, and in country there are 1,524.
+\par We observed a high degree of variability within each of these genres, which leads to difficulties in obtaining any kind of translation due to the cycle-consistency constraint. We therefore attempted different techniques of clustering, to group albums by similarities within each genre – these clustering strategies are outlined below. Additionally, we extracted each album with faces in the cleaning process, to remove artwork likely to include photography and focus on less realistic forms of art.
+
+\subsection{$K$-means}
+
+The first clustering method we attempted was $k$-means, one of the most general and basic clustering methods. With high dimensional data such as images, the use of Singular Value Decomposition prior to the clustering helps reducing our dataset to lower dimensional data while still retaining valuable information, in order to accelerate the clustering process \cite{cite-key}. The 10 singular vectors corresponding to the 10 highest singular values are kept. A value of $k=10$ was sufficient to keep enough data for the training of the Cycle GAN while still retaining enough closeness between artwork within each cluster. Sample clusters can be found in figures \ref{mk} and \ref{ck} of the appendices.
+
+\subsection{Feature Distance}
+
+Pairwise distance between each photograph in a genre and a target photo were calculated using feature detection functions available through OpenCV. The SURF feature detector was used to extract features from the individual album cover, both because it was efficient enough to make this method tractable, and because it uses Haar wavelets response distributions \cite{cite-key2}, which was the most descriptive single feature found in the original paper. L1 (Manhattan distance) distance was selected to match features by brute force, because it was reported to better captures human interpretation of image similarity \cite{Sinha06facerecognition}. Sample clusters can be found in figure \ref{msu} of the appendices.
+
+\subsection{SSIM}
+
+Structural similarity index is a measurement originally intended grade image quality, by distinguishing between an original photo and slightly distorted alternatives \cite{1284395}. Pairwise distance between each album in a genre was calculated using the SSIM function available through Sci-Kit Image. While not originally intended to be a clustering method, this produced some interesting results – albums within the broad category of metal that were most easily identified or stereotypically metal was clustered at the low end of SSIM distance. Classical albums most stereotypically appearing to be classical clustered at the high end of SSIM within their greater genre. In each case, the 25 albums with the most dramatic of their respective ranges, and the 30 nearest neighbors to those 25 albums, were split into training and testing datasets. Sample clusters can be found in figures \ref{ms} and \ref{cs} of the appendices.
+
+\section{Methods and Results}
+
+\subsection{Cycle-consistent Adversarial Networks}
+
+The Cycle-GAN was trained over the course of 100 epochs, with a learning rate of 0.0002 on the first 50 before decaying it for the last 50. We maintained $\lambda = 10$ as the relative importance of the two goals. The Networks were trained on the RCC using 3 GPUs with a batch size of 12.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.7\textwidth]{../report_files/training_graph.png}
+\caption{Training of the Cycle-GAN}
+\end{figure}
+
+After trying out each clustering method, the feature image clustering method \cite{5696720} had mixed success. The target image for the dataset is shown in the upper left corner. The resulting dataset seems to be a more or less random selection from the larger metal category, with no greater visual similarity than the data pool at large \ref{msu}. The SSIM method was not intended to be a clustering tool, but originally was going to be applied as a method of comparing final and input images. It is intended to be used as a metric for evaluating very similar images, or the same image with a small degree of noise. SSIM as used here likely reflects the “busyness” of an image – the most prototypically metal albums are clustered at the low end of SSIM values because the albums have a significant amount of decoration and texture, and so are very structurally dissimilar to one another. Classical albums tend to be somewhat simpler, and so are detected as more similar by the SSIM metric (appendix 3).
+
+Even given these efforts at limiting the variety in our training sets, we found that the cycle-GAN was unsuccessful at producing any meaningful structural change in the image or texture, except for slight changes in color scheme and slight blurring (Fig. 1).
+
+
+\subsection{Style transfer using Convolutional Neural Networks}
+
+\section{Conclusion}
+
+Regardless of the clustering method employed, the cycle-GAN did not produce noticeably different images. We predict that this issue stems from not only the variability of data within a genre, but also the variability between genres. Two types of losses were employed by the cycle-GAN: adversarial loss, and cycle consistency loss. Adversarial loss is the loss function structure typically employed by GANs, in which one network generates albums in the style of the target genre, and the other network distinguishes those generated albums, rejecting ones that do not sufficiently imitate the properties of the target genre. Cycle consistency loss is calculated by mapping the new album back to its original domain – the closer it can get to the original, the smaller the loss. We predict that an interaction between these loss functions caused the failure of the cycle-GAN to change the images. The variability between the two genres was so significant, that any album generated by the adversarial networks could not be mapped back to the original domain. Only very small changes in color or slight blurring of the images could sufficiently pass through both loss functions. Adjusting the $\lambda$ value so that the relative importance of the generative adversarial network was greater than the cycle-GAN may have improved performance, but it is hard to predict how insignificant the cycle consistency loss could be made before the network was exclusively a GAN.
+
+\par This project further emphasizes the importance of dataset construction in the overall success of a computer vision project. A method of clustering the data both within and between genres may produce more significant changes in the final album cover, although by limiting the dataset by this constraint, the final albums may be harder to identify as the target genre. In the future, it may be interesting to limit the dataset to more common patterns seen on many albums, i.e. translating the fonts used on the album covers from one genre to another, as the content of the images would be more similar. Neural style transfer was a much more successful method of accomplishing our goal – one possible future area of research would be to generalize the extracted style across several sample images, instead of only one.
+
+
+
+\bibliography{mybib}
+\bibliographystyle{ieeetr}
+
+\newpage
+
+\appendix
+
+\section{Clustering samples using $k$-means}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/Metal_kmeans.png}
+\caption{Cluster of Metal Album Artwork}
+\label{mk}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/Country_kmeans.png}
+\caption{Cluster of Country Album Artwork}
+\label{ck}
+\end{figure}
+
+\section{Clustering samples using feature distance method}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/Metal_SURF.png}
+\caption{Cluster of Metal Album Artwork}
+\label{msu}
+\end{figure}
+
+\section{Clustering samples using SSIM method}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/Metal_SSIM.png}
+\caption{Cluster of Metal Album Artwork}
+\label{ms}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.6\textwidth]{../report_files/Classic_SSIM.png}
+\caption{Cluster of Classic Album Artwork}
+\label{cs}
+\end{figure}
+
+
+\end{document}
